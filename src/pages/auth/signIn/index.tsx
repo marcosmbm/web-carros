@@ -1,9 +1,17 @@
+import { useFormSignIn, type FormData } from "./hooks/useFormSignIn";
+
 import { Link } from "react-router-dom";
 
 import logo from "@/assets/logo.svg";
 import { Container, Input, Button } from "@/components/ui";
 
 export default function SignIn() {
+  const { register, handleSubmit, errors } = useFormSignIn();
+
+  function onSubmit(data: FormData) {
+    console.log(data);
+  }
+
   return (
     <Container>
       <div className="w-full min-h-screen flex flex-col justify-center items-center">
@@ -15,9 +23,24 @@ export default function SignIn() {
           />
         </Link>
 
-        <form className="w-full max-w-2xl flex flex-col p-4 bg-white shadow-md rounded-lg gap-4">
-          <Input placeholder="Digite seu email" type="email" />
-          <Input placeholder="Digite sua senha" type="password" />
+        <form
+          className="w-full max-w-xl flex flex-col p-4 bg-white shadow-md rounded-lg gap-4"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Input
+            placeholder="Digite seu email"
+            type="email"
+            name="email"
+            register={register}
+            error={errors.email?.message}
+          />
+          <Input
+            placeholder="Digite sua senha"
+            type="password"
+            name="password"
+            register={register}
+            error={errors.password?.message}
+          />
 
           <Button type="submit">Acessar</Button>
         </form>
