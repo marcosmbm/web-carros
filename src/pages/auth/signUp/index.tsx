@@ -1,3 +1,4 @@
+import { useAuth } from "@/hooks";
 import { useFormSignUp, type FormData } from "./hooks/useFormSignUp";
 import { useNavigate } from "react-router-dom";
 
@@ -6,9 +7,9 @@ import { Link } from "react-router-dom";
 import logo from "@/assets/logo.svg";
 import { Container, Input, Button } from "@/components/ui";
 
-import { UserService } from "@/services/repositories";
-
 export default function SignUp() {
+  const { signUp } = useAuth();
+
   const { register, handleSubmit, errors } = useFormSignUp();
 
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function SignUp() {
     try {
       const { name, email, password } = data;
 
-      await UserService.create({ name, email, password });
+      await signUp(name, email, password);
 
       navigate("/login", { replace: true });
     } catch (error) {

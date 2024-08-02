@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 
 interface CreateUserProps {
@@ -36,6 +37,10 @@ class UserRepository implements IUserRepository {
 
   async login({ email, password }: LoginUserProps) {
     await signInWithEmailAndPassword(auth, email, password);
+  }
+
+  async logout() {
+    await signOut(auth);
   }
 }
 

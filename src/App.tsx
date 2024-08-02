@@ -1,5 +1,10 @@
 import RouterApp from "./routes";
+import AuthProvider from "./contexts/auth";
 
 export default function App() {
-  return <RouterApp />;
+  return (
+    <AuthProvider>
+      <RouterApp />
+    </AuthProvider>
+  );
 }
