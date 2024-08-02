@@ -1,15 +1,26 @@
 import { useFormSignIn, type FormData } from "./hooks/useFormSignIn";
+import { useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
 
 import logo from "@/assets/logo.svg";
 import { Container, Input, Button } from "@/components/ui";
 
+import { UserService } from "@/services/repositories";
+
 export default function SignIn() {
   const { register, handleSubmit, errors } = useFormSignIn();
+  const navigate = useNavigate();
 
-  function onSubmit(data: FormData) {
-    console.log(data);
+  async function onSubmit(data: FormData) {
+    try {
+      const { email, password } = data;
+
+      await UserService.login({ email, password });
+      navigate("/dashboard", { replace: true });
+    } catch (error) {
+      alert("Erro ao logar usuário");
+    }
   }
 
   return (

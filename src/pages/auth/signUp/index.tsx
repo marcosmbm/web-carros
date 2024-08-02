@@ -1,15 +1,28 @@
 import { useFormSignUp, type FormData } from "./hooks/useFormSignUp";
+import { useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
 
 import logo from "@/assets/logo.svg";
 import { Container, Input, Button } from "@/components/ui";
 
+import { UserService } from "@/services/repositories";
+
 export default function SignUp() {
   const { register, handleSubmit, errors } = useFormSignUp();
 
-  function onSubmit(data: FormData) {
-    console.log(data);
+  const navigate = useNavigate();
+
+  async function onSubmit(data: FormData) {
+    try {
+      const { name, email, password } = data;
+
+      await UserService.create({ name, email, password });
+
+      navigate("/login", { replace: true });
+    } catch (error) {
+      alert("Erro ao cadastrar usuário");
+    }
   }
 
   return (

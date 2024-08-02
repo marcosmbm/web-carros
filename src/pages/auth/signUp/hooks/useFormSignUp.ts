@@ -6,7 +6,7 @@ const schema = z.object({
   name: z.string().min(1, "O campo de nome é obrigatório"),
   email: z
     .string()
-    .min(1, "O campo de email obrigatório")
+    .min(6, "A senha deve conter pelo menos 6 caracteres")
     .email("Email inválido"),
   password: z.string().min(1, "O campo de senha é obrigatório"),
 });
