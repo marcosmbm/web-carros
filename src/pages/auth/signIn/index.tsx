@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks";
 import { useFormSignIn, type FormData } from "./hooks/useFormSignIn";
 import { useNavigate } from "react-router-dom";
@@ -14,14 +15,20 @@ export default function SignIn() {
 
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   async function onSubmit(data: FormData) {
     try {
       const { email, password } = data;
+
+      setIsLoading(true);
 
       await signIn(email, password);
       navigate("/dashboard", { replace: true });
     } catch (error) {
       alert("Erro ao logar usuário");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -55,7 +62,9 @@ export default function SignIn() {
             error={errors.password?.message}
           />
 
-          <Button type="submit">Acessar</Button>
+          <Button type="submit" isLoading={isLoading}>
+            Acessar
+          </Button>
         </form>
 
         <span className="mt-4">

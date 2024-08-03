@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks";
 import { useFormSignUp, type FormData } from "./hooks/useFormSignUp";
 import { useNavigate } from "react-router-dom";
@@ -14,15 +15,20 @@ export default function SignUp() {
 
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   async function onSubmit(data: FormData) {
     try {
       const { name, email, password } = data;
 
+      setIsLoading(true);
       await signUp(name, email, password);
 
       navigate("/login", { replace: true });
     } catch (error) {
       alert("Erro ao cadastrar usuário");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -65,7 +71,9 @@ export default function SignUp() {
             error={errors.password?.message}
           />
 
-          <Button type="submit">Cadastrar</Button>
+          <Button type="submit" isLoading={isLoading}>
+            Cadastrar
+          </Button>
         </form>
 
         <span className="mt-4">
