@@ -1,7 +1,7 @@
 import type { RegisterOptions, UseFormRegister } from "react-hook-form";
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface TextAreaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   register?: UseFormRegister<any>;
   name?: string;
@@ -9,17 +9,17 @@ export interface InputProps
   rules?: RegisterOptions;
 }
 
-export function Input({
-  register,
+export function TextArea({
   name = "",
-  rules,
   error,
+  rules,
+  register,
   ...rest
-}: InputProps) {
+}: TextAreaProps) {
   return (
     <div className="flex-1 flex flex-col gap-1">
-      <input
-        className="flex-1 border-2 rounded-lg min-h-9 px-3 outline-none"
+      <textarea
+        className="flex-1 border-2 rounded-lg min-h-20 px-3 outline-none resize-none"
         {...(register ? register(name, rules) : {})}
         {...rest}
       />
