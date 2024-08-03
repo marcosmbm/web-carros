@@ -5,6 +5,8 @@ import CarDetail from "./car";
 import Dashboard from "./dashboard";
 import New from "./dashboard/new";
 
+import { Private } from "@/components/Private";
+
 export const AppRoutes: RouteObject[] = [
   {
     path: "/",
@@ -12,14 +14,26 @@ export const AppRoutes: RouteObject[] = [
   },
   {
     path: "/car/:id",
-    element: <CarDetail />,
+    element: (
+      <Private>
+        <CarDetail />
+      </Private>
+    ),
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <Private>
+        <Dashboard />
+      </Private>
+    ),
   },
   {
     path: "/dashboard/new",
-    element: <New />,
+    element: (
+      <Private>
+        <New />
+      </Private>
+    ),
   },
 ];
