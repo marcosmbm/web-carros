@@ -1,18 +1,80 @@
-import { useRef } from "react";
+import { type ChangeEvent, useRef, useState } from "react";
+import { useAuth } from "@/hooks";
 import { type FormData, useNewForm } from "./hooks/useNewForm";
 
 import { Container, FieldInput, Button, FieldTextArea } from "@/components/ui";
 import { PanelHeader } from "../components/panelHeader";
 
-import { FiUpload } from "react-icons/fi";
+import { FiUpload, FiTrash } from "react-icons/fi";
+import { v4 as uuidV4 } from "uuid";
+
+import {
+  onUploadImage,
+  onDeleteImage,
+  type ImageItemProps,
+} from "@/services/storage";
 
 export default function New() {
   const inputFileRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, errors, reset } = useNewForm();
 
+  const { user } = useAuth();
+
+  const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
+
   function onClickInputFile() {
     inputFileRef.current?.click();
+  }
+
+  async function handleUpload(image: File) {
+    try {
+      if (!user?.uid) {
+        return;
+      }
+
+      const currentUserUid = user.uid;
+      const uuidImage = uuidV4();
+      const path = `images/${currentUserUid}/${uuidImage}`;
+
+      const downloadUrl = await onUploadImage(image, path);
+
+      const imageItem: ImageItemProps = {
+        name: uuidImage,
+        uid: currentUserUid,
+        previewUrl: URL.createObjectURL(image),
+        url: downloadUrl,
+      };
+      setCarImages((images) => [...images, imageItem]);
+    } catch (error) {
+      alert("Erro ao salvar imagem");
+    }
+  }
+
+  async function handleDeleteImage(image: ImageItemProps) {
+    try {
+      const imagePath = `images/${image.uid}/${image.name}`;
+      await onDeleteImage(imagePath);
+
+      setCarImages((images) => images.filter((item) => item.url !== image.url));
+    } catch (error) {
+      alert("Não foi possível deletar a imagem");
+    }
+  }
+
+  async function handleFile(event: ChangeEvent<HTMLInputElement>) {
+    const files = event.target.files;
+
+    if (files && files.length > 0) {
+      const image = files[0];
+
+      if (["image/jpeg", "image/png"].includes(image.type)) {
+        await handleUpload(image);
+        return;
+      }
+      alert("Envie uma imagem jpeg ou png!");
+      return;
+    }
   }
 
   function onSubmit(data: FormData) {
@@ -26,7 +88,7 @@ export default function New() {
       <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
         <button
           type="button"
-          className="border-2 w-48 h-32 rounded-lg flex items-center justify-center cursor-pointer border-gray-200"
+          className="border-2 min-w-48 h-32 rounded-lg flex items-center justify-center cursor-pointer border-gray-200"
           onClick={onClickInputFile}
         >
           <div>
@@ -38,8 +100,30 @@ export default function New() {
             accept="image/*"
             style={{ width: 1, height: 1 }}
             ref={inputFileRef}
+            onChange={handleFile}
           />
         </button>
+
+        {carImages.map((item) => (
+          <div
+            key={item.name}
+            className="flex-1 h-32 flex flex-row items-center justify-center relative"
+          >
+            <button
+              type="button"
+              className="absolute"
+              onClick={() => handleDeleteImage(item)}
+            >
+              <FiTrash size={28} color="#fff" />
+            </button>
+
+            <img
+              src={item.previewUrl}
+              alt={item.name}
+              className="rounded-lg w-full h-32 object-cover"
+            />
+          </div>
+        ))}
       </div>
 
       <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-2">
