@@ -1,7 +1,11 @@
-import { Container, Input } from "@/components/ui";
+import { useCars } from "@/hooks";
+
+import { Container, Input, Spinner } from "@/components/ui";
 import { CarItem } from "@/components/carItem";
 
 export default function Home() {
+  const { cars, isLoading } = useCars();
+
   return (
     <Container>
       <form className="bg-white p-4 rounded-lg w-full max-w-3xl mx-auto flex items-center justify-between gap-2 shadow-md">
@@ -19,12 +23,15 @@ export default function Home() {
         Carros novos e usados em todo o Brasil.
       </h1>
 
-      <main className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        <CarItem />
-        <CarItem />
-        <CarItem />
-        <CarItem />
-      </main>
+      {isLoading ? (
+        <Spinner isFull size={30} />
+      ) : (
+        <main className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {cars.map((item) => (
+            <CarItem key={item.id} car={item} />
+          ))}
+        </main>
+      )}
     </Container>
   );
 }
