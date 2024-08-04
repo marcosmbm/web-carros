@@ -14,6 +14,8 @@ import {
   type ImageItemProps,
 } from "@/services/storage";
 
+import { CarService } from "@/services/repositories";
+
 export default function New() {
   const inputFileRef = useRef<HTMLInputElement>(null);
 
@@ -22,6 +24,7 @@ export default function New() {
   const { user } = useAuth();
 
   const [carImages, setCarImages] = useState<ImageItemProps[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   function onClickInputFile() {
     inputFileRef.current?.click();
@@ -77,8 +80,43 @@ export default function New() {
     }
   }
 
-  function onSubmit(data: FormData) {
-    console.log(data);
+  async function onSubmit(data: FormData) {
+    try {
+      if (carImages.length === 0) {
+        alert("Envie alguma imagem deste carro!");
+        return;
+      }
+
+      if (!user) {
+        return;
+      }
+
+      setIsLoading(true);
+
+      const carListImages = carImages.map((item) => {
+        return {
+          uid: item.uid,
+          name: item.name,
+          url: item.url,
+        };
+      });
+
+      await CarService.create({
+        ...data,
+        created: new Date(),
+        owner: user?.name as string,
+        userUid: user?.uid as string,
+        images: carListImages,
+      });
+
+      reset();
+      setCarImages([]);
+      alert("Carro cadastrado com sucesso!");
+    } catch (error) {
+      alert("Não foi possível cadastrar o carro! Tente novamente mais tarde.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -210,7 +248,9 @@ export default function New() {
             error={errors.description?.message}
           />
 
-          <Button type="submit">Cadastrar</Button>
+          <Button type="submit" isLoading={isLoading}>
+            Cadastrar
+          </Button>
         </form>
       </div>
     </Container>
